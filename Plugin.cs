@@ -18,13 +18,17 @@ namespace CrucibleWemViewerPlugin
     {
       try
       {
-        var model = new CrucibleWemFile(filesystemEntry);       
+        var model = new CrucibleWemFile(filesystemEntry);
+        var viewModel = new MainViewModel(model);
+        var view = new MainView() { DataContext = viewModel };
 
-        return new FilesystemEntryTab(filesystemEntry)
+        var fsTab = new FilesystemEntryTab(filesystemEntry)
         {
-          Header = filesystemEntry.Name,
-          Content = new MainView() { DataContext = new MainViewModel() }
+          Header = "WEM Audio",
+          Content = view
         };
+
+        return fsTab;
       }
       catch (Exception e)
       {
