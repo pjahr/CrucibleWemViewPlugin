@@ -1,6 +1,9 @@
 ﻿using Crucible;
 using Crucible.Filesystem;
+using CrucibleWemViewerPlugin.Model;
 using System;
+using System.IO;
+using WEMSharp;
 
 namespace CrucibleWemViewerPlugin
 {
@@ -15,6 +18,8 @@ namespace CrucibleWemViewerPlugin
     {
       try
       {
+        var model = new CrucibleWemFile(filesystemEntry);       
+
         return new FilesystemEntryTab(filesystemEntry)
         {
           Header = filesystemEntry.Name,

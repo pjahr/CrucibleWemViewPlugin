@@ -67,6 +67,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="WEMSharp">
+      <HintPath>packages\WEMSharp 1.0\WEMSharp.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -77,6 +80,7 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="MainViewModel.cs" />
+    <Compile Include="Model\CrucibleWemFile.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
