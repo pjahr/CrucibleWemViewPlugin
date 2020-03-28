@@ -16,6 +16,9 @@
     <TextBlock Text="{Binding NumberOfBytesInternal.IsCompleted}"/>
       <TextBlock Text="{Binding NumberOfBytesInternal.IsNotCompleted}"/>
       <TextBlock Text="{Binding NumberOfBytesInternal.IsFaulted}"/>
+      <TextBlock Text="{Binding NumberOfBytesInternal.ErrorMessage}"/>
+      <TextBlock Text="{Binding NumberOfBytesInternal.Exception.Message}"/>
+      <TextBlock Text="{Binding NumberOfBytesInternal.Status}"/>
 
     </StackPanel>
   </Grid>

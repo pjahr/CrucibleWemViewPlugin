@@ -1,10 +1,12 @@
-﻿using CrucibleWemViewerPlugin.Model;
+﻿using Crucible;
+using CrucibleWemViewerPlugin.Model;
 using Nito.Mvvm;
+using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace CrucibleWemViewerPlugin
 {
-  public class MainViewModel
+  public class MainViewModel :INotifyPropertyChanged
   {
     private readonly CrucibleWemFile _model;
 
@@ -12,9 +14,10 @@ namespace CrucibleWemViewerPlugin
     {
       _model = model;
 
-      NumberOfBytesInternal = NotifyTask.Create(LoadDataAsync);
-      
+      NumberOfBytesInternal = NotifyTask.Create(LoadDataAsync);      
     }
+
+    public event PropertyChangedEventHandler PropertyChanged;
 
     public NotifyTask<int> NumberOfBytesInternal { get; private set; }
 
@@ -22,7 +25,13 @@ namespace CrucibleWemViewerPlugin
 
     private async Task<int> LoadDataAsync()
     {
-      return await _model.GetNumberOfRawBytesAsync();
+      MainWindow.SetStatus($"Loading data...");
+
+      var n = await _model.GetNumberOfRawBytesAsync();
+      
+      MainWindow.SetStatus($"Loaded data.");
+
+      return n;
     }
   }
 }

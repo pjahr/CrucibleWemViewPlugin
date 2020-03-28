@@ -53,9 +53,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Crucible">
+    <Reference Include="Crucible, Version=1.0.7308.40862, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\Crucible 4.5\Crucible.exe</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="Nito.Disposables, Version=1.2.3.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\Nito.Disposables.1.2.3\lib\netstandard2.0\Nito.Disposables.dll</HintPath>
@@ -91,6 +91,7 @@
     </Page>
     <Compile Include="MainViewModel.cs" />
     <Compile Include="Model\CrucibleWemFile.cs" />
+    <Compile Include="Model\External.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
