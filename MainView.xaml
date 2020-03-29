@@ -10,17 +10,25 @@
 
   <Grid>
     <StackPanel>
-      
-    <TextBlock Text="{Binding NumberOfBytesInternal.Result}"/>
+
+      <TextBlock Text="Internal file size (bytes):"/>
+      <TextBlock Text="{Binding NumberOfBytesInternal.Result}"/>
     
     <TextBlock Text="{Binding NumberOfBytesInternal.IsCompleted}"/>
+
+      <TextBlock Text="Still trying to read raw data (something is broken):"/>
       <TextBlock Text="{Binding NumberOfBytesInternal.IsNotCompleted}"/>
-      <TextBlock Text="{Binding NumberOfBytesInternal.IsFaulted}"/>
-      <TextBlock Text="{Binding NumberOfBytesInternal.ErrorMessage}"/>
-      <TextBlock Text="{Binding NumberOfBytesInternal.Exception.Message}"/>
       <TextBlock Text="{Binding NumberOfBytesInternal.Status}"/>
-      <Button Content="Convert"  Command="{Binding ConvertAudioCommand}"/>
-      <TextBlock Text="{Binding ExitCode}"/>
+
+      <Button Content="Click here to convert WEM to OGG"  Command="{Binding ConvertAudioCommand}"/>
+
+      <TextBlock Text="Temp File:"/>
+      <TextBlock Text="{Binding OggFilePath}"/>
+
+      <Button Content="Play OGG File"  Command="{Binding PlayAudioCommand}"/>
+      
+      <TextBlock Text="Playing:"/>
+      <TextBlock Text="{Binding Playing}"/>
 
     </StackPanel>
   </Grid>

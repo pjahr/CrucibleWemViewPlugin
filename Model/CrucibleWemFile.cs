@@ -31,7 +31,7 @@ namespace CrucibleWemViewerPlugin.Model
       return _fileSystemEntry.GetData();
     }
 
-    public async Task<int> ConvertAsync()
+    public async Task<string> ConvertAsync()
     {
       var tmpDirectory = Path.GetTempPath();
 
@@ -65,7 +65,7 @@ namespace CrucibleWemViewerPlugin.Model
 
       MainWindow.SetStatus($"Wrote {oggFilePath}");
 
-      return exitCode;
+      return oggFilePath;
     }
   }
 }
