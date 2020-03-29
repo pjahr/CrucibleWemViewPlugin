@@ -47,7 +47,7 @@ namespace CrucibleWemViewerPlugin.Model
       var wemFile = new WEMFile(wemFilePath, WEMForcePacketFormat.NoForcePacketFormat);
       MainWindow.SetStatus($"Wrote {wemFilePath}");
 
-      var codebookPath=Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\packed_codebooks_aoTuV_603.bin");
+      var codebookPath=Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\WemViewerPlugin_Resources\packed_codebooks_aoTuV_603.bin");
       try
       {
 
@@ -59,7 +59,7 @@ namespace CrucibleWemViewerPlugin.Model
         throw new InvalidOperationException($"Failed to write to {oggFilePath}.\\nCodebook path: {codebookPath}", e);
       }
 
-      var revorbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\revorb.exe");
+      var revorbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\WemViewerPlugin_Resources\revorb.exe");
 
       var exitCode = await External.RunProcessAsync(revorbPath, oggFilePath);
 
