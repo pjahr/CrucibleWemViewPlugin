@@ -1,6 +1,8 @@
 ﻿using Crucible;
 using Crucible.Filesystem;
 using CrucibleWemViewerPlugin.Model;
+using CrucibleWemViewerPlugin.View;
+using CrucibleWemViewerPlugin.ViewModel;
 using System;
 
 namespace CrucibleWemViewerPlugin

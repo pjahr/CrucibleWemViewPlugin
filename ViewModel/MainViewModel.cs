@@ -2,12 +2,11 @@
 using CrucibleWemViewerPlugin.Model;
 using NAudio.Wave;
 using Nito.Mvvm;
-using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CrucibleWemViewerPlugin
+namespace CrucibleWemViewerPlugin.ViewModel
 {
   public class MainViewModel : INotifyPropertyChanged
   {
@@ -34,10 +33,10 @@ namespace CrucibleWemViewerPlugin
           waveOut.Init(vorbisStream);
           waveOut.PlaybackStopped += Stop;
           Playing = true;
-          await Task.Run(()=>
+          await Task.Run(() =>
           {
             waveOut.Play();
-            while(Playing)
+            while (Playing)
             {
               Thread.Sleep(20);
             }
