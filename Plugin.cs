@@ -2,8 +2,6 @@
 using Crucible.Filesystem;
 using CrucibleWemViewerPlugin.Model;
 using System;
-using System.IO;
-using WEMSharp;
 
 namespace CrucibleWemViewerPlugin
 {
