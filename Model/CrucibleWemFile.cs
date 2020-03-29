@@ -59,8 +59,9 @@ namespace CrucibleWemViewerPlugin.Model
         throw new InvalidOperationException($"Failed to write to {oggFilePath}.\\nCodebook path: {codebookPath}", e);
       }
 
-      //var exitCode = await External.RunProcessAsync("revorb.exe", "");
-      var exitCode = await Task.FromResult(0);
+      var revorbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\revorb.exe");
+
+      var exitCode = await External.RunProcessAsync(revorbPath, oggFilePath);
 
       MainWindow.SetStatus($"Wrote {oggFilePath}");
 
