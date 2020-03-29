@@ -19,6 +19,8 @@
       <TextBlock Text="{Binding NumberOfBytesInternal.ErrorMessage}"/>
       <TextBlock Text="{Binding NumberOfBytesInternal.Exception.Message}"/>
       <TextBlock Text="{Binding NumberOfBytesInternal.Status}"/>
+      <Button Content="Convert"  Command="{Binding ConvertAudioCommand}"/>
+      <TextBlock Text="{Binding ExitCode}"/>
 
     </StackPanel>
   </Grid>

@@ -14,14 +14,21 @@ namespace CrucibleWemViewerPlugin
     {
       _model = model;
 
-      NumberOfBytesInternal = NotifyTask.Create(LoadDataAsync);      
+      NumberOfBytesInternal = NotifyTask.Create(LoadDataAsync);
+
+      ConvertAudioCommand = new AsyncCommand(async () =>
+      {
+        ExitCode = await _model.ConvertAsync();
+      });
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
     public NotifyTask<int> NumberOfBytesInternal { get; private set; }
 
-    public string InternalFileSize { get; private set; }
+    public IAsyncCommand ConvertAudioCommand { get; private set; }
+
+    public int ExitCode { get; private set; }
 
     private async Task<int> LoadDataAsync()
     {

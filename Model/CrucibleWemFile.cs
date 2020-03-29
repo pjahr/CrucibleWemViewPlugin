@@ -31,7 +31,7 @@ namespace CrucibleWemViewerPlugin.Model
       return _fileSystemEntry.GetData();
     }
 
-    private void Convert()
+    public async Task<int> ConvertAsync()
     {
       var tmpDirectory = Path.GetTempPath();
 
@@ -47,17 +47,24 @@ namespace CrucibleWemViewerPlugin.Model
       var wemFile = new WEMFile(wemFilePath, WEMForcePacketFormat.NoForcePacketFormat);
       MainWindow.SetStatus($"Wrote {wemFilePath}");
 
-      wemFile.GenerateOGG(oggFilePath, "packed_codebooks_aoTuV_603", false, false);
+      var codebookPath=Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\packed_codebooks_aoTuV_603.bin");
+      try
+      {
 
+        wemFile.GenerateOGG(oggFilePath, codebookPath, false, false);
+      }
+      catch (Exception e)
+      {
+        // TODO: fail gacefully
+        throw new InvalidOperationException($"Failed to write to {oggFilePath}.\\nCodebook path: {codebookPath}", e);
+      }
 
-
+      //var exitCode = await External.RunProcessAsync("revorb.exe", "");
+      var exitCode = await Task.FromResult(0);
 
       MainWindow.SetStatus($"Wrote {oggFilePath}");
 
-
-
-
+      return exitCode;
     }
-
   }
 }
