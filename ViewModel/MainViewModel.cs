@@ -23,7 +23,7 @@ namespace CrucibleWemViewerPlugin.ViewModel
     {
       _model = model;
       FileNameInternal = _model.FileName;
-      PathInternal = _model.Path;
+      PathInternal = _model.PathInternal;
       LastModified = $"{_model.LastModified}";
 
       NumberOfBytesInternal = NotifyTask.Create(LoadDataAsync);
