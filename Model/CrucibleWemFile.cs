@@ -17,6 +17,10 @@ namespace CrucibleWemViewerPlugin.Model
       _fileSystemEntry = filesystemEntry;
     }
 
+    public string FileName => _fileSystemEntry.Name;
+    public string Path => _fileSystemEntry.FullPath;
+    public DateTime LastModified => _fileSystemEntry.LastModifiedDate;
+
     public async Task<int> GetNumberOfRawBytesAsync()
     {
       if (_rawData == null)

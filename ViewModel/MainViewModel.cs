@@ -11,12 +11,20 @@ namespace CrucibleWemViewerPlugin.ViewModel
   public class MainViewModel : INotifyPropertyChanged
   {
     private readonly CrucibleWemFile _model;
+
+    public string FileNameInternal { get; }
+    public string PathInternal { get; }
+    public string LastModified { get; }
+
     private bool _playing;
     private string _oggFilePath;
 
     internal MainViewModel(CrucibleWemFile model)
     {
       _model = model;
+      FileNameInternal = _model.FileName;
+      PathInternal = _model.Path;
+      LastModified = $"{_model.LastModified}";
 
       NumberOfBytesInternal = NotifyTask.Create(LoadDataAsync);
 

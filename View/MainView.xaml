@@ -5,30 +5,52 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:vm="clr-namespace:CrucibleWemViewerPlugin.ViewModel"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="450" d:DesignWidth="400"
              d:DataContext="{d:DesignInstance vm:MainViewModel, IsDesignTimeCreatable=True}">
 
-  <Grid>
+  <UserControl.Resources>
+    <Style TargetType="TextBlock">
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style x:Key="Label" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="Gray"/>
+      <Setter Property="FontSize" Value="7"/>
+    </Style>
+
+    <Style x:Key="Title" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontSize" Value="16"/>
+    </Style>
+
+  </UserControl.Resources>
+  
+  
+  <Grid Margin="24">
     <StackPanel>
 
-      <TextBlock Text="Internal file size (bytes):"/>
-      <TextBlock Text="{Binding NumberOfBytesInternal.Result}"/>
-    
-    <TextBlock Text="{Binding NumberOfBytesInternal.IsCompleted}"/>
+      <TextBlock Text="Internal file name" 
+                 Style="{StaticResource Label}"/>
+      <TextBlock Text="{Binding FileNameInternal}"
+                 Style="{StaticResource Title}"/>
 
-      <TextBlock Text="Still trying to read raw data (something is broken):"/>
-      <TextBlock Text="{Binding NumberOfBytesInternal.IsNotCompleted}"/>
-      <TextBlock Text="{Binding NumberOfBytesInternal.Status}"/>
+      <TextBlock Text="{Binding PathInternal}"/>
+      <TextBlock Text="{Binding LastModified}"/>
 
-      <Button Content="Click here to convert WEM to OGG"  Command="{Binding ConvertAudioCommand}"/>
+      <TextBlock Text="Internal file size (bytes)"
+                 Style="{StaticResource Label}"/>
+      <TextBlock Text="{Binding NumberOfBytesInternal.Result, StringFormat={}{0} bytes}"
+                 />
 
-      <TextBlock Text="Temp File:"/>
-      <TextBlock Text="{Binding OggFilePath}"/>
-
-      <Button Content="Play OGG File"  Command="{Binding PlayAudioCommand}"/>
-      
-      <TextBlock Text="Playing:"/>
-      <TextBlock Text="{Binding Playing}"/>
+      <StackPanel Orientation="Horizontal">
+        
+        <Button Content="Click here to convert WEM to OGG"
+                Command="{Binding ConvertAudioCommand}"/>
+        
+        <Button Content="Play OGG File"
+                Command="{Binding PlayAudioCommand}"/>
+        
+      </StackPanel>
 
     </StackPanel>
   </Grid>
