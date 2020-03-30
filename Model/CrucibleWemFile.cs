@@ -18,7 +18,7 @@ namespace CrucibleWemViewerPlugin.Model
     }
 
     public string FileName => _fileSystemEntry.Name;
-    public string Path => _fileSystemEntry.FullPath;
+    public string PathInternal => _fileSystemEntry.FullPath;
     public DateTime LastModified => _fileSystemEntry.LastModifiedDate;
 
     public async Task<int> GetNumberOfRawBytesAsync()
@@ -54,7 +54,6 @@ namespace CrucibleWemViewerPlugin.Model
       var codebookPath=Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\WemViewerPlugin_Resources\packed_codebooks_aoTuV_603.bin");
       try
       {
-
         wemFile.GenerateOGG(oggFilePath, codebookPath, false, false);
       }
       catch (Exception e)
