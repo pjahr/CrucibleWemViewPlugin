@@ -1,23 +1,24 @@
 ﻿using Crucible;
 using CrucibleWemViewerPlugin.Model;
+using Microsoft.Win32;
 using NAudio.Wave;
 using Nito.Mvvm;
+using System;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace CrucibleWemViewerPlugin.ViewModel
 {
   public class MainViewModel : INotifyPropertyChanged
   {
     private readonly CrucibleWemFile _model;
-
-    public string FileNameInternal { get; }
-    public string PathInternal { get; }
-    public string LastModified { get; }
-
     private bool _playing;
-    private string _oggFilePath;
+
+    private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+    private readonly CancellationToken _ct;
+
 
     internal MainViewModel(CrucibleWemFile model)
     {
@@ -26,32 +27,99 @@ namespace CrucibleWemViewerPlugin.ViewModel
       PathInternal = _model.PathInternal;
       LastModified = $"{_model.LastModified}";
 
+      Playing = false;
+      _ct = _cts.Token;
+
       NumberOfBytesInternal = NotifyTask.Create(LoadDataAsync);
-
-      ConvertAudioCommand = new AsyncCommand(async () =>
+      OggFilePath = NotifyTask.Create(SaveAudioToTemporaryFile);
+      PlayAudioCommand = new AsyncCommand(async () => 
       {
-        OggFilePath = await _model.ConvertAsync();
-      });
-
-      PlayAudioCommand = new AsyncCommand(async () =>
-      {
-        using (var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(OggFilePath))
-        using (var waveOut = new WaveOutEvent())
+        try
         {
-          waveOut.Init(vorbisStream);
-          waveOut.PlaybackStopped += Stop;
-          Playing = true;
-          await Task.Run(() =>
-          {
-            waveOut.Play();
-            while (Playing)
-            {
-              Thread.Sleep(20);
-            }
-          });
+          await PlayAudioAsync();
         }
+        catch (OperationCanceledException)
+        {
+        }
+        
       });
+      StopPlayingAudioCommand = new AsyncCommand(async () => await StopAudioAsync());
+      SaveAudioToFileCommand = new AsyncCommand(async () => await SaveAudioToFileAsync());
+    }
 
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public string FileNameInternal { get; }
+    public string PathInternal { get; }
+    public string LastModified { get; }
+    public NotifyTask<int> NumberOfBytesInternal { get; private set; }
+    public NotifyTask<string> OggFilePath { get; private set; }
+    public IAsyncCommand PlayAudioCommand { get; private set; }
+    public IAsyncCommand StopPlayingAudioCommand { get; private set; }
+    public IAsyncCommand SaveAudioToFileCommand { get; }
+
+    public Visibility PlayVisible { get; private set; }
+    public Visibility StopVisible { get; private set; } 
+
+    private bool Playing
+    {
+      get => _playing;
+      set
+      {
+        _playing = value;
+        PlayVisible = _playing ? Visibility.Hidden : Visibility.Visible;
+        StopVisible = _playing ? Visibility.Visible: Visibility.Hidden;
+        
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PlayVisible)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StopVisible)));
+      }
+    }
+    
+    private async Task PlayAudioAsync()
+    {
+      using (var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(OggFilePath.Result))
+      using (var waveOut = new WaveOutEvent())
+      {
+        waveOut.Init(vorbisStream);
+        waveOut.PlaybackStopped += Stop;
+        Playing = true;
+        await Task.Run(() =>
+        {
+          waveOut.Play();
+          while (Playing)
+          {
+            if (_ct.IsCancellationRequested)
+            {
+              _ct.ThrowIfCancellationRequested();
+            }
+            Thread.Sleep(20);
+          }
+        }, _ct);
+      }
+    }
+
+    private async Task StopAudioAsync()
+    {
+      await Task.Run(() => _cts.Cancel());
+    }
+
+    private async Task SaveAudioToFileAsync()
+    {
+      var saveFileDialog = new SaveFileDialog()
+      {
+        Filter = "WAV file (*.wav)|*.wav"
+      };
+
+      if (saveFileDialog.ShowDialog() == false)
+      {
+        return;
+      }
+
+      using (var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(OggFilePath.Result))
+      using (var waveOut = new WaveOutEvent())
+      {
+        await Task.Run(() => WaveFileWriter.CreateWaveFile(saveFileDialog.FileName, vorbisStream));
+      }
     }
 
     private void Stop(object sender, StoppedEventArgs e)
@@ -59,29 +127,9 @@ namespace CrucibleWemViewerPlugin.ViewModel
       Playing = false;
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public NotifyTask<int> NumberOfBytesInternal { get; private set; }
-
-    public IAsyncCommand ConvertAudioCommand { get; private set; }
-    public IAsyncCommand PlayAudioCommand { get; private set; }
-
-    public string OggFilePath
+    private async Task<string> SaveAudioToTemporaryFile()
     {
-      get => _oggFilePath; private set
-      {
-        _oggFilePath = value;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(OggFilePath)));
-      }
-    }
-
-    public bool Playing
-    {
-      get => _playing; private set
-      {
-        _playing = value;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Playing)));
-      }
+      return await _model.ConvertAsync();
     }
 
     private async Task<int> LoadDataAsync()
