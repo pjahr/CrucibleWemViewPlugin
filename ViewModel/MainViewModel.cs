@@ -16,9 +16,8 @@ namespace CrucibleWemViewerPlugin.ViewModel
     private readonly CrucibleWemFile _model;
     private bool _playing;
 
-    private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-    private readonly CancellationToken _ct;
-
+    private CancellationTokenSource _cts = new CancellationTokenSource();
+    private CancellationToken _ct;
 
     internal MainViewModel(CrucibleWemFile model)
     {
@@ -27,24 +26,15 @@ namespace CrucibleWemViewerPlugin.ViewModel
       PathInternal = _model.PathInternal;
       LastModified = $"{_model.LastModified}";
 
-      Playing = false;
-      _ct = _cts.Token;
-
+      // async properties
       NumberOfBytesInternal = NotifyTask.Create(LoadDataAsync);
       OggFilePath = NotifyTask.Create(SaveAudioToTemporaryFile);
-      PlayAudioCommand = new AsyncCommand(async () => 
-      {
-        try
-        {
-          await PlayAudioAsync();
-        }
-        catch (OperationCanceledException)
-        {
-        }
-        
-      });
+
+      PlayAudioCommand = new AsyncCommand(async () => await PlayAudioAsync());
       StopPlayingAudioCommand = new AsyncCommand(async () => await StopAudioAsync());
       SaveAudioToFileCommand = new AsyncCommand(async () => await SaveAudioToFileAsync());
+
+      Playing = false;
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -52,14 +42,13 @@ namespace CrucibleWemViewerPlugin.ViewModel
     public string FileNameInternal { get; }
     public string PathInternal { get; }
     public string LastModified { get; }
+    public Visibility PlayVisible { get; private set; }
+    public Visibility StopVisible { get; private set; } 
     public NotifyTask<int> NumberOfBytesInternal { get; private set; }
     public NotifyTask<string> OggFilePath { get; private set; }
     public IAsyncCommand PlayAudioCommand { get; private set; }
     public IAsyncCommand StopPlayingAudioCommand { get; private set; }
     public IAsyncCommand SaveAudioToFileCommand { get; }
-
-    public Visibility PlayVisible { get; private set; }
-    public Visibility StopVisible { get; private set; } 
 
     private bool Playing
     {
@@ -77,29 +66,42 @@ namespace CrucibleWemViewerPlugin.ViewModel
     
     private async Task PlayAudioAsync()
     {
-      using (var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(OggFilePath.Result))
-      using (var waveOut = new WaveOutEvent())
+      try
       {
-        waveOut.Init(vorbisStream);
-        waveOut.PlaybackStopped += Stop;
-        Playing = true;
-        await Task.Run(() =>
+        using (var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(OggFilePath.Result))
+        using (var waveOut = new WaveOutEvent())
         {
-          waveOut.Play();
-          while (Playing)
+          waveOut.Init(vorbisStream);
+
+          Playing = true;
+          _cts = new CancellationTokenSource();
+          _ct = _cts.Token;
+          await Task.Run(() =>
           {
-            if (_ct.IsCancellationRequested)
+            waveOut.Play();
+            while (waveOut.PlaybackState!=PlaybackState.Stopped)
             {
-              _ct.ThrowIfCancellationRequested();
+              _ct.ThrowIfCancellationRequested(); // cancel this task if requested
+              Thread.Sleep(20);
             }
-            Thread.Sleep(20);
-          }
-        }, _ct);
+            // cleanup after playing
+            _cts.Dispose();
+            Playing = false;
+
+          }, _ct);
+        }
       }
+      catch (OperationCanceledException)
+      {
+        // cleanup after cancel
+        _cts.Dispose();
+        Playing = false;
+      }      
     }
 
     private async Task StopAudioAsync()
     {
+      // request canceling of play task
       await Task.Run(() => _cts.Cancel());
     }
 
@@ -120,11 +122,6 @@ namespace CrucibleWemViewerPlugin.ViewModel
       {
         await Task.Run(() => WaveFileWriter.CreateWaveFile(saveFileDialog.FileName, vorbisStream));
       }
-    }
-
-    private void Stop(object sender, StoppedEventArgs e)
-    {
-      Playing = false;
     }
 
     private async Task<string> SaveAudioToTemporaryFile()
